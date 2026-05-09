@@ -3,14 +3,23 @@
 #include <stdint.h>
 #include <time.h>
 
+#ifdef __MINGW32__
+#include <malloc.h>
+#define aligned_malloc(size) _aligned_malloc(size, 64)
+#define aligned_free(ptr)    _aligned_free(ptr)
+#else
+#define aligned_malloc(size) aligned_alloc(64,(size))
+#define aligned_free(ptr)    free(ptr)
+#endif
+
 #define N 4096
 #define BLOCK 64
 #define VLEN 8
 
 int main(void) {
-    int32_t *A = (int32_t *)aligned_alloc(64, N * N * sizeof(int32_t));
-    int32_t *B = (int32_t *)aligned_alloc(64, N * N * sizeof(int32_t));
-    int32_t *C = (int32_t *)aligned_alloc(64, N * N * sizeof(int32_t));
+    int32_t *A = (int32_t *)aligned_malloc(N * N * sizeof(int32_t));
+    int32_t *B = (int32_t *)aligned_malloc(N * N * sizeof(int32_t));
+    int32_t *C = (int32_t *)aligned_malloc(N * N * sizeof(int32_t));
 
     for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++) {
@@ -60,8 +69,8 @@ int main(void) {
     printf("checksum: %ld\n", (long)(sum % 100000));
     printf("time: %.6f\n", elapsed);
 
-    free(A);
-    free(B);
-    free(C);
+    aligned_free(A);
+    aligned_free(B);
+    aligned_free(C);
     return 0;
 }

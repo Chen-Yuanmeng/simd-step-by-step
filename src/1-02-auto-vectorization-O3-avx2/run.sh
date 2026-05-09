@@ -7,13 +7,15 @@ else
     CC=gcc
 fi
 CFLAGS="-O3 -mavx2"
+LDFLAGS=""
+[ "$(uname -s)" = "Linux" ] && LDFLAGS="-lrt"
 SRC=main.c
 OUT=matmul
 ASM=matmul.s
 
 echo "=== 1-02-auto-vectorization-O3-avx2 ==="
 $CC $CFLAGS -fopt-info-vec -S -o $ASM $SRC
-$CC $CFLAGS -o $OUT $SRC -lrt
+$CC $CFLAGS -o $OUT $SRC $LDFLAGS
 
 echo "Results for 1-02-auto-vectorization-O3-avx2 (-O3 -mavx2)" > results.txt
 
@@ -23,9 +25,9 @@ if [ -x ./$OUT ] && ./$OUT 2>/dev/null; then
         output=$(./$OUT)
         t=$(echo "$output" | grep "time:" | awk '{print $2}')
         echo "Run $i: $t s" >> results.txt
-        total=$(echo "$total + $t" | bc -l)
+        total=$(awk "BEGIN {print $total + $t}")
     done
-    avg=$(echo "scale=6; $total / 10" | bc -l)
+    avg=$(awk "BEGIN {printf \"%.6f\", $total / 10}")
     echo "Average: $avg s" >> results.txt
 else
     echo "Skipping execution (cross-compiled for x86_64, cannot run on this arch)" >> results.txt

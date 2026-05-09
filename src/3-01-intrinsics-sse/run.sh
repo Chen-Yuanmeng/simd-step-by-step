@@ -7,13 +7,15 @@ else
     CC=gcc
 fi
 CFLAGS="-O3 -msse4.1"
+LDFLAGS=""
+[ "$(uname -s)" = "Linux" ] && LDFLAGS="-lrt"
 SRC=main.c
 OUT=matmul
 ASM=matmul.s
 
 echo "=== 3-01-intrinsics-sse ==="
 $CC $CFLAGS -S -o $ASM $SRC
-$CC $CFLAGS -o $OUT $SRC -lrt
+$CC $CFLAGS -o $OUT $SRC $LDFLAGS
 
 echo "Results for 3-01-intrinsics-sse (-O3 -msse4.1)" > results.txt
 
@@ -23,9 +25,9 @@ if [ -x ./$OUT ] && ./$OUT 2>/dev/null; then
         output=$(./$OUT)
         t=$(echo "$output" | grep "time:" | awk '{print $2}')
         echo "Run $i: $t s" >> results.txt
-        total=$(echo "$total + $t" | bc -l)
+        total=$(awk "BEGIN {print $total + $t}")
     done
-    avg=$(echo "scale=6; $total / 10" | bc -l)
+    avg=$(awk "BEGIN {printf \"%.6f\", $total / 10}")
     echo "Average: $avg s" >> results.txt
 else
     echo "Skipping execution (cross-compiled for x86_64, cannot run on this arch)" >> results.txt

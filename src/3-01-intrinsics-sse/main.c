@@ -4,7 +4,7 @@
 #include <time.h>
 #include <smmintrin.h>
 
-#define N 1024
+#define N 4096
 #define BLOCK 64
 #define VLEN 4
 

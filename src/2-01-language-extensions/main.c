@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#define N 1024
+#define N 4096
 #define BLOCK 64
 
 static void matmul(int32_t *__restrict__ A,
